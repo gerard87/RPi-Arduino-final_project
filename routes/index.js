@@ -7,11 +7,16 @@ router.get('/', function(req, res, next) {
     res.render('index', { title: 'Raspberry Pi' });
 });
 
-router.post('/readvalues', function (req, res) {
+router.get('/read', function(req, res, next) {
     const command = './i2c_scripts/read_values';
     child = exec(command, function (error, stdout, stderr) {
         console.log(stdout);
-        res.send(stdout);
+        var array = stdout.split(",");
+        res.render('read', {
+            temperature: array[0],
+            humidity: array[1],
+            bpm: array[2]
+        });
     });
 
 });
