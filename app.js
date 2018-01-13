@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var storage = require('node-persist');
+var exec = require('child_process').exec, child;
 
 var index = require('./routes/index');
 
@@ -22,6 +24,56 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+
+
+setInterval(saveToDatabase, 300000);
+
+function saveToDatabase () {
+
+    const command = './i2c_scripts/read_values';
+    child = exec(command, function (error, stdout, stderr) {
+        console.log(stdout);
+
+        var array = stdout.split(",");
+        array[2] = array[2].replace(/\n/g, '');
+
+        var sensors = [];
+        sensors.push(array[0]);
+        sensors.push(array[1]);
+        sensors.push(array[2]);
+        sensors.push(new Date().toLocaleString());
+
+        storage.init().then(function () {
+
+            storage.getItem('sensors').then(function (value) {
+
+                value.push(sensors);
+
+                storage.setItem('sensors', value).then(function () {
+                    return storage.getItem('sensors');
+                }).then(function (value) {
+                    console.log(value);
+                });
+
+            }).catch(function () {
+
+                var value = [];
+                value.push(sensors);
+
+                storage.setItem('sensors', value).then(function () {
+                    return storage.getItem('sensors');
+                }).then(function (value) {
+                    console.log(value);
+                });
+            });
+
+
+        });
+
+    });
+
+}
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

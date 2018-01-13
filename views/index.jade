@@ -11,6 +11,13 @@ block content
 
             });
 
+            $('#btn_history').on('click', function (event) {
+
+                console.log("Call /history");
+                window.location = '/history';
+
+            });
+
         });
 
     .demo-layout.mdl-layout.mdl-js-layout.mdl-layout--fixed-drawer.mdl-layout--fixed-header
@@ -20,3 +27,7 @@ block content
 
             .demo-updates.mdl-cell.mdl-cell--12-col
                 a#btn_read.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.mdl-button--accent.mdl-color--blue-grey-800.mdl-color-text--white Read values
+
+
+            .demo-updates.mdl-cell.mdl-cell--12-col
+                a#btn_history.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.mdl-button--accent.mdl-color--blue-grey-800.mdl-color-text--white History
