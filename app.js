@@ -35,40 +35,48 @@ function saveToDatabase () {
         console.log(stdout);
 
         var array = stdout.split(",");
-        array[2] = array[2].replace(/\n/g, '');
 
-        var sensors = [];
-        sensors.push(array[0]);
-        sensors.push(array[1]);
-        sensors.push(array[2]);
-        sensors.push(new Date().toLocaleString());
+        if (array[0] !== undefined &&
+            array[1] !== undefined &&
+            array[2] !== undefined) {
 
-        storage.init().then(function () {
+            array[2] = array[2].replace(/\n/g, '');
 
-            storage.getItem('sensors').then(function (value) {
+            var sensors = [];
+            sensors.push(array[0]);
+            sensors.push(array[1]);
+            sensors.push(array[2]);
+            sensors.push(new Date().toLocaleString());
 
-                value.push(sensors);
+            storage.init().then(function () {
 
-                storage.setItem('sensors', value).then(function () {
-                    return storage.getItem('sensors');
-                }).then(function (value) {
-                    console.log(value);
+                storage.getItem('sensors').then(function (value) {
+
+                    value.push(sensors);
+
+                    storage.setItem('sensors', value).then(function () {
+                        return storage.getItem('sensors');
+                    }).then(function (value) {
+                        console.log(value);
+                    });
+
+                }).catch(function () {
+
+                    var value = [];
+                    value.push(sensors);
+
+                    storage.setItem('sensors', value).then(function () {
+                        return storage.getItem('sensors');
+                    }).then(function (value) {
+                        console.log(value);
+                    });
                 });
 
-            }).catch(function () {
 
-                var value = [];
-                value.push(sensors);
-
-                storage.setItem('sensors', value).then(function () {
-                    return storage.getItem('sensors');
-                }).then(function (value) {
-                    console.log(value);
-                });
             });
 
+        }
 
-        });
 
     });
 
