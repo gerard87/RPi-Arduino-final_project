@@ -38,7 +38,7 @@ function saveToDatabase (array) {
     sensors.push(array[0]);
     sensors.push(array[1]);
     sensors.push(array[2]);
-    sensors.push(new Date().toLocaleString());
+    sensors.push(new Date().toLocaleString('es-ES', { hour12: false }));
 
     storage.init().then(function () {
 
