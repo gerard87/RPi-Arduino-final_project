@@ -1,15 +1,14 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var storage = require('node-persist');
-var exec = require('child_process').exec, child;
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const arduino = require('./arduino');
 
-var index = require('./routes/index');
+const index = require('./routes/index');
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,53 +29,15 @@ setInterval(saveToDatabase, 300000);
 
 function saveToDatabase () {
 
-    const command = './i2c_scripts/read_values';
-    child = exec(command, function (error, stdout, stderr) {
-        console.log(stdout);
+    arduino.readValuesFromArdB().then(data => {
 
-        var array = stdout.split(",");
+        if (data[0] !== undefined &&
+            data[1] !== undefined &&
+            data[2] !== undefined) {
 
-        if (array[0] !== undefined &&
-            array[1] !== undefined &&
-            array[2] !== undefined) {
-
-            array[2] = array[2].replace(/\n/g, '');
-
-            var sensors = [];
-            sensors.push(array[0]);
-            sensors.push(array[1]);
-            sensors.push(array[2]);
-            sensors.push(new Date().toLocaleString());
-
-            storage.init().then(function () {
-
-                storage.getItem('sensors').then(function (value) {
-
-                    value.push(sensors);
-
-                    storage.setItem('sensors', value).then(function () {
-                        return storage.getItem('sensors');
-                    }).then(function (value) {
-                        console.log(value);
-                    });
-
-                }).catch(function () {
-
-                    var value = [];
-                    value.push(sensors);
-
-                    storage.setItem('sensors', value).then(function () {
-                        return storage.getItem('sensors');
-                    }).then(function (value) {
-                        console.log(value);
-                    });
-                });
-
-
-            });
+            arduino.saveToDatabase(data);
 
         }
-
 
     });
 
@@ -85,8 +46,8 @@ function saveToDatabase () {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
+    const err = new Error('Not Found');
+    err.status = 404;
   next(err);
 });
 
