@@ -9,6 +9,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/read', function(req, res, next) {
+
+    /* Get values from Arduino B */
     const command = './i2c_scripts/read_values';
     child = exec(command, function (error, stdout, stderr) {
         console.log(stdout);
@@ -27,6 +29,7 @@ router.get('/read', function(req, res, next) {
             sensors.push(array[2]);
             sensors.push(new Date().toLocaleString());
 
+            /* Save values to database */
             storage.init().then(function () {
 
                 storage.getItem('sensors').then(function (value) {
@@ -53,9 +56,17 @@ router.get('/read', function(req, res, next) {
 
 
             });
+
+
+
+            /* Send values to Arduino A LCD */
+            const cmd = './i2c_scripts/write_values ' + array[0] + " , " + array[1] + " . " + array[2];
+            child = exec(cmd, function (error, stdout, stderr) {
+                console.log(stdout);
+            });
+
+
         }
-
-
 
         res.render('read', {
             temperature: array[0],
@@ -69,6 +80,7 @@ router.get('/read', function(req, res, next) {
 
 router.get('/history', function(req, res, next) {
 
+    /* Get all values from database */
     storage.init().then(function () {
         storage.getItem('sensors').then(function (values) {
             console.log(values);
