@@ -10,6 +10,8 @@ const index = require('./routes/index');
 
 const app = express();
 
+var reading = false;
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -31,7 +33,8 @@ setInterval(readKeys, 10);
 function readKeys () {
     arduino.readKeysFromArdA().then(data => {
 
-        if (parseInt(data) < 900) {
+        if (parseInt(data) < 900 && !reading) {
+            reading = true;
             arduino.readValuesFromArdB().then(data => {
 
                 if (data[0] !== undefined &&
@@ -40,6 +43,10 @@ function readKeys () {
 
                     arduino.writeValuesToArdA(data).then(data => {
                         console.log(data);
+                        setTimeout(function () {
+                            reading = false;
+                        }, 1000);
+
                     });
 
                 }
