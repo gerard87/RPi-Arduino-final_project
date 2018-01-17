@@ -31,7 +31,7 @@ setInterval(readKeys, 10);
 function readKeys () {
     arduino.readKeysFromArdA().then(data => {
 
-        if (data !== '1023') {
+        if (parseInt(data) < 900) {
             arduino.readValuesFromArdB().then(data => {
 
                 if (data[0] !== undefined &&
