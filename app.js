@@ -24,8 +24,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 
-
 setInterval(saveToDatabase, 300000);
+setInterval(readKeys, 10);
+
+
+function readKeys () {
+    arduino.readKeysFromArdA().then(data => {
+
+        if (data !== '1023') {
+            arduino.readValuesFromArdB().then(data => {
+
+                if (data[0] !== undefined &&
+                    data[1] !== undefined &&
+                    data[2] !== undefined) {
+
+                    arduino.writeValuesToArdA(data).then(data => {
+                        console.log(data);
+                    });
+
+                }
+
+            });
+        }
+
+    });
+}
+
 
 function saveToDatabase () {
 

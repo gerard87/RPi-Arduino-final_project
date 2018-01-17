@@ -46,14 +46,7 @@ int main(int argc, char** argv) {
   printf("%s\n", cmd);
 
   if (write(file, cmd, strlen(cmd)) == strlen(cmd)) {
-
         usleep(10000);
-
-        char buf[4];
-        if (read(file, buf, 4) == 4) {
-           int temp = (((buf[3]*256+buf[2])*256+buf[1]*256)+buf[0]);
-           printf("Received %d\n", temp);
-        }
   }
 
 }

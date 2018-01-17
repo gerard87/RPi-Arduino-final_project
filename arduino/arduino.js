@@ -32,6 +32,16 @@ function writeValuesToArdA (data) {
     });
 }
 
+function readKeysFromArdA () {
+    return new  Promise(function (resolve, reject) {
+        const cmd = './i2c_scripts/read_keys';
+        child = exec(cmd, function (error, stdout, stderr) {
+            return resolve(stdout);
+        });
+    });
+}
+
+
 function saveToDatabase (array) {
 
     const sensors = [];
@@ -71,5 +81,6 @@ function saveToDatabase (array) {
 module.exports = {
     readValuesFromArdB,
     writeValuesToArdA,
+    readKeysFromArdA,
     saveToDatabase
 };
